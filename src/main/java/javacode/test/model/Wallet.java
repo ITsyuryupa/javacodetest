@@ -16,7 +16,6 @@ public class Wallet {
 
     @Id
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "wallet_id", updatable = false, nullable = false)
     private UUID walletId;
 

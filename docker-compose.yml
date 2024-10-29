@@ -1,0 +1,36 @@
+version: "3.1"
+
+volumes:
+  pg_crud:
+
+services:
+  javacodetest:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=javacodetest
+    volumes:
+      - pg_crud:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - my_network
+
+  app:
+    restart: always
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - javacodetest
+    environment:
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://javacodetest:5432/javacodetest'
+      JAVA_OPTS: '-Xmx512m'
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
