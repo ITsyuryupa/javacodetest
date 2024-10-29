@@ -22,21 +22,17 @@ public class WalletController {
 
     @GetMapping("/{walletId}")
     public ResponseEntity<BigDecimal> getBalance(@PathVariable UUID walletId) {
-        try {
-            BigDecimal balance = walletService.getBalance(walletId);
-            return ResponseEntity.ok(balance);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+        BigDecimal balance = walletService.getBalance(walletId);
+        return ResponseEntity.ok(balance);
+
     }
 
     @PostMapping
     public ResponseEntity<String> processOperation(@RequestBody WalletOperationRequest request) {
-        try {
-            walletService.processOperation(request.getWalletId(), request.getOperationType(), request.getAmount());
-            return ResponseEntity.ok("Operation successful");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        walletService.processOperation(request.getWalletId(), request.getOperationType(), request.getAmount());
+        return ResponseEntity.ok("Operation successful");
+
     }
+
+
 }

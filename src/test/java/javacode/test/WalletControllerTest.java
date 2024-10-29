@@ -1,9 +1,10 @@
 package javacode.test;
-import javacode.test.сontroller.WalletController;
 
+import javacode.test.сontroller.WalletController;
 import javacode.test.service.WalletService;
 import javacode.test.util.WalletOperationRequest;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -34,32 +35,48 @@ class WalletControllerTest {
     }
 
     @Test
-    void testGetAndUpdateBalance() {
-        // Начальный баланс
+    @DisplayName("testGetBalance")
+    void testGetBalance() {
         BigDecimal initialBalance = BigDecimal.valueOf(100.00);
-        // Сумма для пополнения
-        BigDecimal amountToAdd = BigDecimal.valueOf(50.00);
-        // Ожидаемый баланс после пополнения
-        BigDecimal expectedBalance = initialBalance.add(amountToAdd);
-
-        // Настройка моков
         when(walletService.getBalance(walletId)).thenReturn(initialBalance);
 
-        // Получаем баланс
         ResponseEntity<BigDecimal> getBalanceResponse = walletController.getBalance(walletId);
+
         assertEquals(HttpStatus.OK, getBalanceResponse.getStatusCode());
         assertEquals(initialBalance, getBalanceResponse.getBody());
 
-        // Пополняем баланс
+        verify(walletService, times(1)).getBalance(walletId);
+    }
+
+    @Test
+    @DisplayName("testDepositBalance")
+    void testDepositBalance() {
+        BigDecimal amountToAdd = BigDecimal.valueOf(50.00);
+
         WalletOperationRequest request = new WalletOperationRequest(walletId, "DEPOSIT", amountToAdd);
+
+        doNothing().when(walletService).processOperation(walletId, "DEPOSIT", amountToAdd);
         ResponseEntity<String> processOperationResponse = walletController.processOperation(request);
+
         assertEquals(HttpStatus.OK, processOperationResponse.getStatusCode());
         assertEquals("Operation successful", processOperationResponse.getBody());
 
-        // Проверяем обновленный баланс
-        when(walletService.getBalance(walletId)).thenReturn(expectedBalance);
-        ResponseEntity<BigDecimal> updatedBalanceResponse = walletController.getBalance(walletId);
-        assertEquals(HttpStatus.OK, updatedBalanceResponse.getStatusCode());
-        assertEquals(expectedBalance, updatedBalanceResponse.getBody());
+        verify(walletService, times(1)).processOperation(walletId, "DEPOSIT", amountToAdd);
+    }
+
+    @Test
+    @DisplayName("testWithdrawBalance")
+    void testWithdrawBalance() {
+        BigDecimal amountToWithdraw = BigDecimal.valueOf(50.00);
+
+        WalletOperationRequest request = new WalletOperationRequest(walletId, "WITHDRAW", amountToWithdraw);
+
+        doNothing().when(walletService).processOperation(walletId, "WITHDRAW", amountToWithdraw);
+        ResponseEntity<String> processOperationResponse = walletController.processOperation(request);
+
+        assertEquals(HttpStatus.OK, processOperationResponse.getStatusCode());
+        assertEquals("Operation successful", processOperationResponse.getBody());
+
+        verify(walletService, times(1)).processOperation(walletId, "WITHDRAW", amountToWithdraw);
     }
 }
