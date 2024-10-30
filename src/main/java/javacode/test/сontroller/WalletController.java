@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/wallet")
+@RequestMapping("/api/v1/wallet")
 public class WalletController {
 
     private final WalletService walletService;
